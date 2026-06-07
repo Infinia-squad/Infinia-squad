@@ -1,0 +1,25 @@
+# Environment variables (API keys - never push this!)
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Data file (optional - remove this line if you want to track complaints)
+data/complaints.json
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# VS Code settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Streamlit cache
+.streamlit/

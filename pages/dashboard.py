@@ -1,99 +1,65 @@
 import streamlit as st
-import pandas as pd
 import sys
 sys.path.append(".")
-from services.db_service import get_sorted_complaints, clear_all_complaints
-from utils.helpers import get_urgency_color, get_sentiment_color, get_urgency_emoji, get_sentiment_emoji
+from services.groq_service import analyze_complaint
+from services.db_service import save_complaint
+from utils.helpers import get_urgency_emoji, get_sentiment_emoji
 
 def show():
     st.markdown("""
-        <div style='text-align:center; padding: 20px 0'>
-            <h1>📊 Support Team Dashboard</h1>
-            <p style='color: gray; font-size: 16px'>Complaints sorted by urgency — highest priority first</p>
+        <div style='padding: 24px 0 8px 0'>
+            <h2 style='color:#e8eaf0; font-size:22px; margin-bottom:4px; font-weight:500;'>Customer Support Portal</h2>
+            <p style='color:#9499b0; font-size:14px; margin:0;'>Submit your complaint and our team will prioritize it immediately</p>
         </div>
     """, unsafe_allow_html=True)
 
     st.divider()
 
-    complaints = get_sorted_complaints()
+    with st.form("complaint_form", clear_on_submit=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            name = st.text_input("Full Name", placeholder="John Doe")
+        with col2:
+            email = st.text_input("Email / User ID", placeholder="john@example.com")
 
-    # Stats row
-    total = len(complaints)
-    critical = len([c for c in complaints if c.get("urgency_label") == "Critical"])
-    high = len([c for c in complaints if c.get("urgency_label") == "High"])
-    negative = len([c for c in complaints if c.get("sentiment") == "Negative"])
+        complaint = st.text_area(
+            "Describe your issue",
+            placeholder="Please describe your complaint in detail...",
+            height=150
+        )
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("📋 Total Complaints", total)
-    col2.metric("🔴 Critical", critical)
-    col3.metric("🟠 High Priority", high)
-    col4.metric("😡 Negative Sentiment", negative)
+        submitted = st.form_submit_button("Submit Complaint", use_container_width=True)
 
-    st.divider()
+    if submitted:
+        if not name or not email or not complaint:
+            st.error("Please fill in all fields before submitting.")
+            return
 
-    # Refresh and clear buttons
-    col1, col2 = st.columns([4, 1])
-    with col1:
-        st.subheader("📌 Live Complaint Feed")
-    with col2:
-        if st.button("🗑️ Clear All", type="secondary"):
-            clear_all_complaints()
-            st.rerun()
+        with st.spinner("Analyzing your complaint..."):
+            analysis = analyze_complaint(complaint)
 
-    if not complaints:
-        st.info("📭 No complaints yet. Waiting for submissions...")
-        return
+        complaint_data = {
+            "name": name,
+            "email": email,
+            "complaint": complaint,
+            "sentiment": analysis.get("sentiment"),
+            "sentiment_symbol": analysis.get("sentiment_symbol"),
+            "urgency_score": analysis.get("urgency_score"),
+            "urgency_label": analysis.get("urgency_label"),
+            "summary": analysis.get("summary"),
+        }
 
-    # Display each complaint as a card
-    for c in complaints:
-        urgency_color = get_urgency_color(c.get("urgency_label", "Medium"))
-        sentiment_color = get_sentiment_color(c.get("sentiment", "Neutral"))
+        save_complaint(complaint_data)
 
-        with st.container():
-            st.markdown(f"""
-                <div style='
-                    border-left: 5px solid {urgency_color};
-                    background: #1e1e2e;
-                    padding: 16px 20px;
-                    border-radius: 8px;
-                    margin-bottom: 12px;
-                '>
-                    <div style='display:flex; justify-content:space-between; align-items:center;'>
-                        <div>
-                            <span style='font-size:18px; font-weight:700;'>#{c.get("id")} — {c.get("name")}</span>
-                            <span style='color:gray; font-size:13px; margin-left:10px;'>{c.get("email")}</span>
-                        </div>
-                        <div>
-                            <span style='
-                                background:{urgency_color}22;
-                                color:{urgency_color};
-                                padding: 4px 10px;
-                                border-radius: 20px;
-                                font-size: 13px;
-                                font-weight: 600;
-                                margin-right: 8px;
-                            '>{get_urgency_emoji(c.get("urgency_label"))} {c.get("urgency_label")} — {c.get("urgency_score")}/10</span>
-                            <span style='
-                                background:{sentiment_color}22;
-                                color:{sentiment_color};
-                                padding: 4px 10px;
-                                border-radius: 20px;
-                                font-size: 13px;
-                                font-weight: 600;
-                            '>{get_sentiment_emoji(c.get("sentiment"))} {c.get("sentiment")} {c.get("sentiment_symbol")}</span>
-                        </div>
-                    </div>
-                    <p style='margin: 10px 0 4px 0; color: #ccc;'>{c.get("complaint")}</p>
-                    <p style='color: gray; font-size: 12px;'>📋 {c.get("summary")} &nbsp;|&nbsp; 🕐 {c.get("timestamp")}</p>
-                </div>
-            """, unsafe_allow_html=True)
+        st.success("Your complaint has been submitted successfully.")
 
-    st.divider()
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Sentiment", analysis.get("sentiment"))
+        with col2:
+            st.metric("Urgency Score", f"{analysis.get('urgency_score')} / 10")
+        with col3:
+            st.metric("Priority Level", analysis.get("urgency_label"))
 
-    # Table view
-    st.subheader("📊 Summary Table")
-    df = pd.DataFrame(complaints)
-    if not df.empty:
-        display_df = df[["id", "name", "email", "urgency_score", "urgency_label", "sentiment", "summary", "timestamp"]].copy()
-        display_df.columns = ["ID", "Name", "Email", "Score", "Priority", "Sentiment", "Summary", "Time"]
-        st.dataframe(display_df, use_container_width=True, hide_index=True)
+        st.info(f"Summary: {analysis.get('summary')}")
+        st.caption("Our support team has been notified and will contact you shortly.")

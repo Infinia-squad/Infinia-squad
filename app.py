@@ -4,12 +4,11 @@ sys.path.append(".")
 
 st.set_page_config(
     page_title="Complaint Prioritizer",
-    page_icon="🆘",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom dark theme styling
 st.markdown("""
     <style>
         .stApp { background-color: #0f1117; }
@@ -28,15 +27,16 @@ st.markdown("""
             border-radius: 10px;
             padding: 12px;
         }
+        .stRadio > label { color: #9499b0 !important; }
+        .stDivider { border-color: #2a2d3e; }
     </style>
 """, unsafe_allow_html=True)
 
-# Sidebar navigation
 with st.sidebar:
     st.markdown("""
         <div style='text-align:center; padding: 20px 0'>
-            <h2>🆘 Complaint<br>Prioritizer</h2>
-            <p style='color:gray; font-size:13px'>AI-Powered Support System</p>
+            <h2 style='color:#e8eaf0; font-size:18px; margin-bottom:4px;'>Complaint Prioritizer</h2>
+            <p style='color:#9499b0; font-size:12px; margin:0;'>AI-Powered Support System</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -44,24 +44,24 @@ with st.sidebar:
 
     page = st.radio(
         "Navigate",
-        ["📝 Submit Complaint", "📊 Support Dashboard"],
+        ["Submit Complaint", "Support Dashboard"],
         label_visibility="collapsed"
     )
 
     st.divider()
 
     st.markdown("""
-        <div style='color:gray; font-size:12px; text-align:center;'>
-            <p>Powered by</p>
-            <p>🤖 Groq AI (LLaMA 3)</p>
-            <p>Built with Streamlit</p>
+        <div style='color:#9499b0; font-size:12px; text-align:center; padding: 8px 0;'>
+            <p style='margin:4px 0;'>Powered by Groq AI (LLaMA 3)</p>
+            <p style='margin:4px 0;'>Built with Streamlit</p>
+            <p style='margin:10px 0 4px 0; color:#6c8cf5; font-weight:600;'>Infinia Squad</p>
+            <p style='margin:0; font-size:11px;'></p>
         </div>
     """, unsafe_allow_html=True)
 
-# Page routing
-if page == "📝 Submit Complaint":
+if page == "Submit Complaint":
     from pages.user_form import show
     show()
-elif page == "📊 Support Dashboard":
+elif page == "Support Dashboard":
     from pages.dashboard import show
     show()

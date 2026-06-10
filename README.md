@@ -28,6 +28,10 @@ Customer support teams receive hundreds of tickets daily — most are routine, b
 > **This tool uses AI to instantly score every incoming complaint and surface the most dangerous ones — before it's too late.**
 
 ---
+### Demo Video
+
+Watch the full end-to-end demo here:
+[https://drive.google.com/file/d/1UcjNR4Dj_JZWSEskOfXxcnNy0tk_ejCz/view?usp=sharing](https://drive.google.com/file/d/1UcjNR4Dj_JZWSEskOfXxcnNy0tk_ejCz/view?usp=sharing)
 
 ## ✨ Features
 

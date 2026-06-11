@@ -28,10 +28,17 @@ Customer support teams receive hundreds of tickets daily — most are routine, b
 > **This tool uses AI to instantly score every incoming complaint and surface the most dangerous ones — before it's too late.**
 
 ---
-### Demo Video
+## 🎥 Demo Video
 
 Watch the full end-to-end demo here:
-[https://drive.google.com/file/d/1UcjNR4Dj_JZWSEskOfXxcnNy0tk_ejCz/view?usp=sharing](https://drive.google.com/file/d/1UcjNR4Dj_JZWSEskOfXxcnNy0tk_ejCz/view?usp=sharing)
+
+- [🔗 Link 1: Live Demo](https://demo-video-delta.vercel.app/)
+- [🔗 Link 2: Google Drive Video](https://drive.google.com/file/d/1UcjNR4Dj_JZWSEskOfXxcnNy0tk_ejCz/view?usp=sharing)
+- 
+## 🚀 Live App (Streamlit)
+
+You can try the project live here:  
+[Click to Open App](https://infinia-squad-endvkt6hdajyhbkhurhp2p.streamlit.app/)
 
 ## ✨ Features
 
